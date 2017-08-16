@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		37A168D11F44E4B00019D43C /* Assistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A168D01F44E4B00019D43C /* Assistant.swift */; };
+		37A168D31F44E4F00019D43C /* Arno.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A168D21F44E4F00019D43C /* Arno.swift */; };
 		3929C48C1E89EC2C00E00B60 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3929C48B1E89EC2C00E00B60 /* AppDelegate.swift */; };
 		3929C48E1E89EC2C00E00B60 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3929C48D1E89EC2C00E00B60 /* ViewController.swift */; };
 		3929C4911E89EC2C00E00B60 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3929C48F1E89EC2C00E00B60 /* Main.storyboard */; };
@@ -34,6 +36,9 @@
 /* Begin PBXFileReference section */
 		11063F3B1EBE651B0033EE6D /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		16DA3C59CAE7D97A9FDD9FA0 /* SampleCode.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+		37A168D01F44E4B00019D43C /* Assistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assistant.swift; sourceTree = "<group>"; };
+		37A168D21F44E4F00019D43C /* Arno.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Arno.swift; sourceTree = "<group>"; };
+		37C2D9F71F43C4B600A07897 /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = System/Library/Frameworks/SceneKit.framework; sourceTree = SDKROOT; };
 		3929C4881E89EC2C00E00B60 /* ARKitExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARKitExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3929C48B1E89EC2C00E00B60 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3929C48D1E89EC2C00E00B60 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -84,6 +89,14 @@
 			path = "UI Elements";
 			sourceTree = "<group>";
 		};
+		37C2D9F61F43C4B600A07897 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				37C2D9F71F43C4B600A07897 /* SceneKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		3929C47F1E89EC2C00E00B60 = {
 			isa = PBXGroup;
 			children = (
@@ -92,6 +105,7 @@
 				3929C4891E89EC2C00E00B60 /* Products */,
 				CC6CF3D48B06681D66F6DE20 /* Configuration */,
 				9C8A8E986AF37F2203F141AB /* LICENSE */,
+				37C2D9F61F43C4B600A07897 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -141,6 +155,8 @@
 				C40FE5251EC239F100732B01 /* Cup.swift */,
 				C40FE5261EC239F100732B01 /* Lamp.swift */,
 				C40FE5281EC239F100732B01 /* Vase.swift */,
+				37A168D01F44E4B00019D43C /* Assistant.swift */,
+				37A168D21F44E4F00019D43C /* Arno.swift */,
 			);
 			path = "Virtual Objects";
 			sourceTree = "<group>";
@@ -229,6 +245,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				39C0B9511E9C63CB003FCA0C /* HitTestVisualization.swift in Sources */,
+				37A168D11F44E4B00019D43C /* Assistant.swift in Sources */,
 				C40FE52B1EC239F100732B01 /* Cup.swift in Sources */,
 				C40FE52A1EC239F100732B01 /* Chair.swift in Sources */,
 				3929C48E1E89EC2C00E00B60 /* ViewController.swift in Sources */,
@@ -236,6 +253,7 @@
 				39C0B95A1E9C6B1F003FCA0C /* Utilities.swift in Sources */,
 				C40FE52E1EC239F100732B01 /* Vase.swift in Sources */,
 				392BB82C1EA19A7C00FBBAC8 /* Plane.swift in Sources */,
+				37A168D31F44E4F00019D43C /* Arno.swift in Sources */,
 				3987BEDC1E9E057F00167FAC /* Gesture.swift in Sources */,
 				C4E87DD91EA6B40F002117D6 /* VirtualObject.swift in Sources */,
 				C40FE5291EC239F100732B01 /* Candle.swift in Sources */,

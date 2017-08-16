@@ -25,6 +25,7 @@ class VirtualObject: SCNNode {
 	}
 	
 	init(modelName: String, fileExtension: String, thumbImageFilename: String, title: String) {
+        print("VirtualObject loading model" + modelName)
 		super.init()
 		self.name = "Virtual object root node"
 		self.modelName = modelName
@@ -93,7 +94,8 @@ extension VirtualObject {
 		Cup(),
 		Vase(),
 		Lamp(),
-		Chair()
+		//Chair(),
+        Arno()
 	]
 }
 
