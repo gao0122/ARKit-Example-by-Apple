@@ -80,6 +80,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 			camera.exposureOffset = -1
 			camera.minimumExposure = -1
 		}
+        
     }
 	
 	func enableEnvironmentMapWithIntensity(_ intensity: CGFloat) {
@@ -107,6 +108,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 				self.enableEnvironmentMapWithIntensity(25)
 			}
 		}
+        
+        self.assistant?.updatePos(time)
 	}
 	
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
@@ -159,6 +162,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
             if use3DOFTrackingFallback && trackingFallbackTimer != nil {
                 trackingFallbackTimer!.invalidate()
                 trackingFallbackTimer = nil
+            }
+            if (self.assistant == nil && self.isLoadingObject == false) {
+                loadAssistant()
             }
         }
 	}
@@ -283,7 +289,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 		textManager.showDebugMessage("Distance: \(distance) m\nRotation: \(angleDegrees)°\nScale: \(scale)x")
 	}
 	
-	func moveVirtualObjectToPosition(_ pos: SCNVector3?, _ instantly: Bool, _ filterPosition: Bool) {
+    func moveVirtualObjectToPosition(_ object: VirtualObject, _ pos: SCNVector3?, _ instantly: Bool, _ filterPosition: Bool) {
 		
 		guard let newPosition = pos else {
 			textManager.showMessage("CANNOT PLACE OBJECT\nTry moving left or right.")
@@ -295,10 +301,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 		}
 		
 		if instantly {
-			setNewVirtualObjectPosition(newPosition)
+            setNewVirtualObjectPosition(object, newPosition)
 		} else {
-			updateVirtualObjectPosition(newPosition, filterPosition)
+			updateVirtualObjectPosition(object, newPosition, filterPosition)
 		}
+        
+        self.assistant?.pathToPosition(newPosition)
 	}
 	
 	var dragOnInfinitePlanesEnabled = false
@@ -375,11 +383,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 	// Use average of recent virtual object distances to avoid rapid changes in object scale.
 	var recentVirtualObjectDistances = [CGFloat]()
 	
-    func setNewVirtualObjectPosition(_ pos: SCNVector3) {
+    func setNewVirtualObjectPosition(_ object : VirtualObject,_ pos: SCNVector3) {
 	
-		guard let object = virtualObject, let cameraTransform = session.currentFrame?.camera.transform else {
-			return
-		}
+        guard let cameraTransform = session.currentFrame?.camera.transform else {
+            print("No cameraTransform")
+            return
+        }
 		
 		recentVirtualObjectDistances.removeAll()
 		
@@ -408,10 +417,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 		UserDefaults.standard.set(-1, for: .selectedObjectID)
 	}
 	
-	func updateVirtualObjectPosition(_ pos: SCNVector3, _ filterPosition: Bool) {
-		guard let object = virtualObject else {
-			return
-		}
+    func updateVirtualObjectPosition(_ object : VirtualObject, _ pos: SCNVector3, _ filterPosition: Bool) {
 		
 		guard let cameraTransform = session.currentFrame?.camera.transform else {
 			return
@@ -497,18 +503,66 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 	}
 	
 	@IBOutlet weak var addObjectButton: UIButton!
-	
+    var assistant : Assistant?
+    
+    func resetAssistant() {
+        assistant?.unloadModel()
+        assistant?.removeFromParentNode()
+        assistant = nil
+    }
+    
+    func loadAssistant() {
+        resetAssistant()
+        
+        let spinner = UIActivityIndicatorView()
+        showProgressIndicator(spinner:spinner);
+        
+        // Load the content asynchronously.
+        DispatchQueue.global().async {
+            self.isLoadingObject = true
+            let object = VirtualObject.availableAssistants[0]
+            object.viewController = self
+            self.assistant = object
+            
+            object.loadModel()
+            
+            DispatchQueue.main.async {
+                // Immediately place the object in 3D space.
+                self.setNewVirtualObjectPosition(object, self.getLastFocusSquarePos() )
+                
+                // Remove progress indicator
+                spinner.removeFromSuperview()
+                
+                // Restore button functionality
+                self.isLoadingObject = false
+            }
+        }
+    }
+    
+    func getLastFocusSquarePos() -> SCNVector3
+    {
+        if let lastFocusSquarePos = self.focusSquare?.lastPosition {
+            return lastFocusSquarePos
+        } else {
+            return SCNVector3Zero
+        }
+    }
+    
+    func showProgressIndicator(spinner : UIActivityIndicatorView) {
+        // Show progress indicator
+        spinner.center = addObjectButton.center
+        spinner.bounds.size = CGSize(width: addObjectButton.bounds.width - 5, height: addObjectButton.bounds.height - 5)
+        addObjectButton.setImage(#imageLiteral(resourceName: "buttonring"), for: [])
+        sceneView.addSubview(spinner)
+        spinner.startAnimating()
+    }
+    
 	func loadVirtualObject(at index: Int) {
 		resetVirtualObject()
 		
-		// Show progress indicator
-		let spinner = UIActivityIndicatorView()
-		spinner.center = addObjectButton.center
-		spinner.bounds.size = CGSize(width: addObjectButton.bounds.width - 5, height: addObjectButton.bounds.height - 5)
-		addObjectButton.setImage(#imageLiteral(resourceName: "buttonring"), for: [])
-		sceneView.addSubview(spinner)
-		spinner.startAnimating()
-		
+        let spinner = UIActivityIndicatorView()
+        showProgressIndicator(spinner:spinner);
+        
 		// Load the content asynchronously.
 		DispatchQueue.global().async {
 			self.isLoadingObject = true
@@ -520,11 +574,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 			
 			DispatchQueue.main.async {
 				// Immediately place the object in 3D space.
-				if let lastFocusSquarePos = self.focusSquare?.lastPosition {
-					self.setNewVirtualObjectPosition(lastFocusSquarePos)
-				} else {
-					self.setNewVirtualObjectPosition(SCNVector3Zero)
-				}
+                self.setNewVirtualObjectPosition(object, self.getLastFocusSquarePos())
+                self.assistant?.playAnimation("jump")
 				
 				// Remove progress indicator
 				spinner.removeFromSuperview()
@@ -535,6 +586,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 				self.addObjectButton.setImage(buttonImage, for: [])
 				self.addObjectButton.setImage(pressedButtonImage, for: [.highlighted])
 				self.isLoadingObject = false
+                
 			}
 		}
     }
