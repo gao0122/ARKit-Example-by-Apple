@@ -9,7 +9,6 @@ import Foundation
 import ARKit
 
 // - MARK: UIImage extensions
-
 extension UIImage {
 	func inverted() -> UIImage? {
         guard let ciImage = CIImage(image: self) else {
@@ -622,4 +621,13 @@ func createPlane(size: CGSize, contents: AnyObject?) -> SCNPlane {
 	let plane = SCNPlane(width: size.width, height: size.height)
 	plane.materials = [SCNMaterial.material(withDiffuse: contents)]
 	return plane
+}
+
+//Mark - Clamp
+extension ClosedRange {
+    func clamp(_ value : Bound) -> Bound {
+        return self.lowerBound > value ? self.lowerBound
+            : self.upperBound < value ? self.upperBound
+            : value
+    }
 }

@@ -307,6 +307,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 		}
         
         self.assistant?.pathToPosition(newPosition)
+        self.assistant?.lookAt(object)
+        self.assistant?.playAnimation("forward")
 	}
 	
 	var dragOnInfinitePlanesEnabled = false

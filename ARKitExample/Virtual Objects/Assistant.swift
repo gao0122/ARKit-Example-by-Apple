@@ -16,6 +16,7 @@ class Assistant: VirtualObject {
     var animKey : String = "idle"
     var targetPos : SCNVector3? = nil
     var lastTime : TimeInterval? = nil
+    var lookAtConstraint : SCNLookAtConstraint? = nil
     
     override init() {
         super.init()
@@ -48,15 +49,28 @@ class Assistant: VirtualObject {
     }
     
     func playAnimation(_ key : String) {
+        // Stop previous animation.
+        animPlayers[animKey]?.stop(withBlendOutDuration: 0.25)
         let player: SCNAnimationPlayer? = animPlayers[key]
-        player?.play()
-        animKey = key
-        print("\tAnimation triggered: " + key)
+        if (player != nil) {
+            player!.blendFactor = 1
+            player!.play()
+            animKey = key
+            print("\tAnimation triggered: " + key)
+        }
     }
     
     func pathToPosition(_ pos : SCNVector3)
     {
         targetPos = pos
+    }
+    
+    func lookAt(_ target: SCNNode) {
+        lookAtConstraint = SCNLookAtConstraint(target: target)
+        lookAtConstraint?.influenceFactor = 0.5 // Smooth turn.
+        lookAtConstraint?.isGimbalLockEnabled = true // This is important, why it is off by default is beyond me.
+        lookAtConstraint?.localFront = SCNVector3Make(0, 0, 1)
+        self.constraints = [lookAtConstraint!]
     }
     
     func updatePos(_ time : TimeInterval)
@@ -65,12 +79,20 @@ class Assistant: VirtualObject {
         {
             let deltaTime : Float = Float(time - lastTime!)
             if (targetPos != nil) {
-                //
-                let dirBefore = self.position.dot(targetPos!)
-                self.position += (targetPos! - self.position) * (1.0 * deltaTime)
-                let dirAfter = self.position.dot(targetPos!)
+                // Increment position by deltaTime * speed
+                let dotBefore = self.position.dot(targetPos!)
+                let dir = targetPos! - self.position
                 
-                if ((dirBefore >= 0 && dirAfter >= 0) || (dirBefore < 0 && dirAfter < 0)) {
+                //self.look(at: targetPos!, up: worldUp, localFront: worldFront)
+                //let neoUp = self.worldPosition + SCNVector3Make(0, 10000, 0)
+                //lookAtConstraint?.worldUp = neoUp
+                
+                let speed = (1 ... 10).clamp(dir.length())
+                
+                self.position += dir * (speed * deltaTime)
+                let dotAfter = self.position.dot(targetPos!)
+                
+                if ((dotBefore >= 0 && dotAfter >= 0) || (dotBefore < 0 && dotAfter < 0)) {
                     // Still going in same direction, so we haven't reached targetPos yet.
                 }
                 else {
