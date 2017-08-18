@@ -157,6 +157,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
             } else {
                 textManager.escalateFeedback(for: camera.trackingState, inSeconds: 10.0)
             }
+            if (self.assistant == nil && self.isLoadingObject == false) {
+                loadAssistant()
+            }
         case .normal:
             textManager.cancelScheduledMessage(forType: .trackingStateEscalation)
             if use3DOFTrackingFallback && trackingFallbackTimer != nil {
@@ -306,7 +309,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 			updateVirtualObjectPosition(object, newPosition, filterPosition)
 		}
         
-        self.assistant?.pathToPosition(newPosition)
+        self.assistant?.moveToPosition(newPosition)
         self.assistant?.lookAt(object)
         self.assistant?.playAnimation("forward")
 	}
@@ -577,7 +580,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 			DispatchQueue.main.async {
 				// Immediately place the object in 3D space.
                 self.setNewVirtualObjectPosition(object, self.getLastFocusSquarePos())
-                self.assistant?.playAnimation("jump")
+                //self.assistant?.playAnimation("jump")
 				
 				// Remove progress indicator
 				spinner.removeFromSuperview()

@@ -120,6 +120,10 @@ extension SCNVector3 {
 	func length() -> Float {
 		return sqrtf(x * x + y * y + z * z)
 	}
+    
+    func lengthSqrd() -> Float {
+        return (x * x + y * y + z * z)
+    }
 	
 	mutating func setLength(_ length: Float) {
 		self.normalize()

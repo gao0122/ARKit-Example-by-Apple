@@ -12,7 +12,7 @@ import SceneKit
 
 class Assistant: VirtualObject {
     
-    var animPlayers = [String: SCNAnimationPlayer]()
+    var animations = [String: CAAnimation]()
     var animKey : String = "idle"
     var targetPos : SCNVector3? = nil
     var lastTime : TimeInterval? = nil
@@ -41,27 +41,29 @@ class Assistant: VirtualObject {
         scene?.rootNode.enumerateChildNodes { (child, _) in
             for key in child.animationKeys {                  // for every animation key
                 print("\tAnimationKey found: " + key)
-                animPlayers[key] = child.animationPlayer(forKey: key)! // get the animation player
+                let animation = child.animation(forKey: key)! // get the animation
+                animation.usesSceneTimeBase = false           // make it system time based
+                animation.repeatCount = Float.infinity        // make it repeat forever
+                child.removeAnimation(forKey: key)
+                animations[key] = animation;
             }
         }
         
-        playAnimation("idle");
+        self.addAnimation(animations["idle"]!, forKey: "idle")
     }
     
     func playAnimation(_ key : String) {
-        // Stop previous animation.
-        animPlayers[animKey]?.stop(withBlendOutDuration: 0.25)
-        let player: SCNAnimationPlayer? = animPlayers[key]
-        if (player != nil) {
-            player!.blendFactor = 1
-            player!.play()
-            animKey = key
-            print("\tAnimation triggered: " + key)
-        }
+        //if (self.animations.count > 0)
+        self.addAnimation(animations[key]!, forKey: key)
+        print("starting animation " + key + ", animKeysCnt=" + String(self.animationKeys.count))
     }
     
-    func pathToPosition(_ pos : SCNVector3)
-    {
+    func stopAnimation(_ key : String) {
+        self.removeAnimation(forKey: key, blendOutDuration: 0.3)
+        print("stopping animation " + key + ", animKeysCnt=" + String(self.animationKeys.count))
+    }
+    
+    func moveToPosition(_ pos : SCNVector3) {
         targetPos = pos
     }
     
@@ -80,25 +82,22 @@ class Assistant: VirtualObject {
             let deltaTime : Float = Float(time - lastTime!)
             if (targetPos != nil) {
                 // Increment position by deltaTime * speed
-                let dotBefore = self.position.dot(targetPos!)
                 let dir = targetPos! - self.position
                 
-                //self.look(at: targetPos!, up: worldUp, localFront: worldFront)
-                //let neoUp = self.worldPosition + SCNVector3Make(0, 10000, 0)
-                //lookAtConstraint?.worldUp = neoUp
+                let lengthSqrd = dir.lengthSqrd()
+                let speed = (1.0 ... 10.0).clamp(lengthSqrd / 1.0)
                 
-                let speed = (1 ... 10).clamp(dir.length())
+                self.position += dir.normalized() * (speed * deltaTime)
+                let dirAfter = targetPos! - self.position
                 
-                self.position += dir * (speed * deltaTime)
-                let dotAfter = self.position.dot(targetPos!)
+                //print("speed:" + String(speed) )
                 
-                if ((dotBefore >= 0 && dotAfter >= 0) || (dotBefore < 0 && dotAfter < 0)) {
-                    // Still going in same direction, so we haven't reached targetPos yet.
-                }
-                else {
+                if (dir.dot(dirAfter) <= 0 ) {
                     // Overshot the targetPos, so set to targetPos
                     self.position = targetPos!
                     targetPos = nil
+                    self.stopAnimation("forward")
+                    //print ("targetPos reached")
                 }
             }
         }
