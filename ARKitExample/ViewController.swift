@@ -109,7 +109,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 			}
 		}
         
-        self.assistant?.updatePos(time)
+        self.assistant?.update(time, session)
 	}
 	
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
@@ -309,9 +309,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 			updateVirtualObjectPosition(object, newPosition, filterPosition)
 		}
         
-        self.assistant?.moveToPosition(newPosition)
-        self.assistant?.lookAt(object)
-        self.assistant?.playAnimation("forward")
+        self.assistant?.moveToCollidable(object, sceneView.scene)
 	}
 	
 	var dragOnInfinitePlanesEnabled = false
@@ -400,6 +398,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
 		let cameraWorldPos = SCNVector3.positionFromTransform(cameraTransform)
 		var cameraToPosition = pos - cameraWorldPos
 		
+        print("2camera worldPosition = " + cameraWorldPos.friendlyString())
+        
 		// Limit the distance of the object from the camera to a maximum of 10 meters.
 		cameraToPosition.setMaximumLength(10)
 
@@ -534,6 +534,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIPopoverPresentation
             DispatchQueue.main.async {
                 // Immediately place the object in 3D space.
                 self.setNewVirtualObjectPosition(object, self.getLastFocusSquarePos() )
+                self.sceneView.scene.rootNode.addChildNode((self.assistant?.lookAtNode)!)
                 
                 // Remove progress indicator
                 spinner.removeFromSuperview()
