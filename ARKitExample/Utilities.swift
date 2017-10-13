@@ -9,13 +9,12 @@ import Foundation
 import ARKit
 
 // - MARK: UIImage extensions
-
 extension UIImage {
 	func inverted() -> UIImage? {
         guard let ciImage = CIImage(image: self) else {
             return nil
         }
-        return UIImage(ciImage: ciImage.applyingFilter("CIColorInvert", withInputParameters: nil))
+        return UIImage(ciImage: ciImage.applyingFilter("CIColorInvert", parameters: [:]))
     }
 	
 	static func composeButtonImage(from thumbImage: UIImage, alpha: CGFloat = 1.0) -> UIImage {
@@ -121,6 +120,10 @@ extension SCNVector3 {
 	func length() -> Float {
 		return sqrtf(x * x + y * y + z * z)
 	}
+    
+    func lengthSqrd() -> Float {
+        return (x * x + y * y + z * z)
+    }
 	
 	mutating func setLength(_ length: Float) {
 		self.normalize()
@@ -443,9 +446,9 @@ extension ARSCNView {
 		let maxAngleInDeg = min(coneOpeningAngleInDegrees, 360) / 2
 		let maxAngle = ((maxAngleInDeg / 180) * Float.pi)
 		
-		let points = features.points
+		let points = features.__points
 		
-		for i in 0...features.count {
+		for i in 0...features.__count {
 			
 			let feature = points.advanced(by: Int(i))
 			let featurePos = SCNVector3(feature.pointee)
@@ -515,13 +518,13 @@ extension ARSCNView {
 			return nil
 		}
 		
-		let points = features.points
+		let points = features.__points
 		
 		// Determine the point from the whole point cloud which is closest to the hit test ray.
 		var closestFeaturePoint = origin
 		var minDistance = Float.greatestFiniteMagnitude
 		
-		for i in 0...features.count {
+		for i in 0...features.__count {
 			let feature = points.advanced(by: Int(i))
 			let featurePos = SCNVector3(feature.pointee)
 			
@@ -622,4 +625,13 @@ func createPlane(size: CGSize, contents: AnyObject?) -> SCNPlane {
 	let plane = SCNPlane(width: size.width, height: size.height)
 	plane.materials = [SCNMaterial.material(withDiffuse: contents)]
 	return plane
+}
+
+//Mark - Clamp
+extension ClosedRange {
+    func clamp(_ value : Bound) -> Bound {
+        return self.lowerBound > value ? self.lowerBound
+            : self.upperBound < value ? self.upperBound
+            : value
+    }
 }

@@ -25,6 +25,7 @@ class VirtualObject: SCNNode {
 	}
 	
 	init(modelName: String, fileExtension: String, thumbImageFilename: String, title: String) {
+        print("VirtualObject loading model: " + modelName)
 		super.init()
 		self.name = "Virtual object root node"
 		self.modelName = modelName
@@ -70,7 +71,7 @@ class VirtualObject: SCNNode {
 		
 		let result = controller.worldPositionFromScreenPosition(pos, objectPos: self.position, infinitePlane: infinitePlane)
 
-		controller.moveVirtualObjectToPosition(result.position, instantly, !result.hitAPlane)
+		controller.moveVirtualObjectToPosition(self, result.position, instantly, !result.hitAPlane)
 	}
 }
 
@@ -95,6 +96,10 @@ extension VirtualObject {
 		Lamp(),
 		Chair()
 	]
+    
+    static let availableAssistants: [Assistant] = [
+        Arno()
+    ]
 }
 
 // MARK: - Protocols for Virtual Objects
