@@ -49,7 +49,6 @@ Provide a large enough area where the user can tap (or begin a drag) on a virtua
 
 **Design interactions for situations where AR illusions can be most convincing.** For example, place virtual content near the centers of detected planes, where it's safer to assume that the detected plane is a good match to the real-world surface. It may be tempting to design experiences that use the full surface of a table top, where virtual scene elements can react to or fall off the table's edges. However, world tracking and plane detection may not precisely estimate the edges of the table.
 
-
 ## User Control
 
 **Strive for a balance between accurately placing virtual content and respecting the user's input.** For example, consider a situation where the user attempts to place content that should appear on top of a flat surface.
@@ -66,3 +65,4 @@ Use the popover presentation (even on iPhone) for auxiliary view controllers to 
 ## Testing
 
 For testing and debugging AR experiences, it helps to have a live visualization of the scene processing that ARKit performs. See the `showDebugVisuals` method in this project's `ViewController` class for world tracking visualization, and the `HitTestVisualization` class for a demonstration of ARKit's feature detection methods.
+I agree with that
